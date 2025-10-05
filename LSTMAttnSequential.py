@@ -45,7 +45,7 @@ def objective_fc(hidden_dim, num_head, lr, epoch_num):
     if int(hidden_dim) % int(num_head) != 0:
         return 1e6
 
-    data, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
+    data, scaler, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
     input_dim=1
     output_dim=20 # A month long
     model = LSTMAttentionModel(input_dim, hidden_dim, output_dim, num_head).to(device)
@@ -79,7 +79,7 @@ def objective_findEpoch(epoch_num):
     lr = 0.000829
     num_head = 2
 
-    data, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
+    data, scaler, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
     input_dim=1
     output_dim=20 # A month long
     model = LSTMAttentionModel(input_dim, hidden_dim, output_dim, num_head).to(device)

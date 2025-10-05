@@ -4,7 +4,7 @@ import pytorch_forecasting.metrics as fcMetric
 import torch.optim as optim
 import time
 
-data, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
+data, scaler, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
 
 def train_model(mdl, epoch_num, optimzr, cr, lossLst, isScientific=False, period=10):
   start = time.time()

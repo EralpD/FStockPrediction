@@ -9,8 +9,8 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.preprocessing import MinMaxScaler
 
-def preProcess(ticker:str, day_intv:str, block_size, split, pred_length):
-    data, today = getData(ticker, day_intv)
+def preProcess(ticker:str, day_intv:str, block_size, split, pred_length, startD="2020-01-01"):
+    data, today = getData(ticker, day_intv, startD)
     data = data.reset_index()
     data.columns = [col[0] for col in data.columns]
 
@@ -25,19 +25,37 @@ def preProcess(ticker:str, day_intv:str, block_size, split, pred_length):
 
     data['Close_scaled'] = scaler.transform(data['Close'].values.reshape(-1, 1))
     data_scaled = data['Close_scaled'].values.reshape(-1, 1)
+    
+    if pred_length < 2:
 
-    e = 0
-    for i in range(block_size+pred_length, len(data)):
-        if len(y_train) < int(split * len(data))-block_size-pred_length:
-            x_train.append(data_scaled[i-block_size-pred_length:i-pred_length])
-            y_train.append(data_scaled[i-pred_length:i])
-        else:
-            if e < block_size+pred_length:
+        # x_train, x_test, y_train, y_test = train_test_split(train_close, data_close, test_size=0.2, shuffle=False)
+
+        e = 0
+        for i in range(block_size, len(data)):
+            if len(y_train) < int(split * len(data))-block_size:
+                x_train.append(data_scaled[i-block_size:i])
+                y_train.append(data_scaled[i])
+            else:
+                if e < block_size:
+                    x_train.append(data_scaled[i-block_size:i])
+                    y_train.append(data_scaled[i])
+                    e += 1
+                x_test.append(data_scaled[i-block_size:i])
+                y_test.append(data_scaled[i])
+    else:
+
+        e = 0
+        for i in range(block_size+pred_length, len(data)):
+            if len(y_train) < int(split * len(data))-block_size-pred_length:
                 x_train.append(data_scaled[i-block_size-pred_length:i-pred_length])
                 y_train.append(data_scaled[i-pred_length:i])
-                e += 1
-            x_test.append(data_scaled[i-block_size-pred_length:i-pred_length])
-            y_test.append(data_scaled[i-pred_length:i])
+            else:
+                if e < block_size+pred_length:
+                    x_train.append(data_scaled[i-block_size-pred_length:i-pred_length])
+                    y_train.append(data_scaled[i-pred_length:i])
+                    e += 1
+                x_test.append(data_scaled[i-block_size-pred_length:i-pred_length])
+                y_test.append(data_scaled[i-pred_length:i])
 
 
     x_train_tensor = torch.tensor(np.array(x_train), dtype=torch.float32)
@@ -57,4 +75,4 @@ def preProcess(ticker:str, day_intv:str, block_size, split, pred_length):
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    return data, (block_size, split, pred_length), (train_loader, test_loader)
+    return data, scaler, (block_size, split, pred_length), (train_loader, test_loader)

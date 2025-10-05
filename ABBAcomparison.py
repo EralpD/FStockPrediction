@@ -94,7 +94,7 @@ def train_model_ABBA(mdl, epoch_num, optimzr, cr, lossLst, isScientific=False, p
   return lossLst
 
 # Without ABBA part
-data, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
+data, scaler, (block_size, split, pred_len), (train_loader, test_loader) = preProcess("AAPL", "1d", block_size=32, split=.8, pred_length=20)
 model = LSTMAttentionModel(1, 209, pred_len, num_head=1)
 
 criterion = fcMetric.SMAPE()
