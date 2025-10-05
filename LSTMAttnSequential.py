@@ -4,7 +4,6 @@ import torch.optim as optim
 import pytorch_forecasting.metrics as fcMetric
 from skopt.space import Integer, Real
 from skopt.utils import use_named_args
-from torchinfo import summary
 from PreProcessMinMax import preProcess
 
 # Without ABBA representation preprocessing
